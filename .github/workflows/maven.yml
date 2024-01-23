@@ -26,10 +26,10 @@ jobs:
           distribution: 'zulu'
           java-version: 11
           server-id: ossrh
-          server-username: ${{ secrets.OSSRH_USERNAME }}
-          server-password: ${{ secrets.OSSRH_PASSWORD }}
+          server-username: OSSRH_USERNAME
+          server-password: OSSRH_PASSWORD
           gpg-private-key: ${{ secrets.MAVEN_GPG_SIGN_PRIVATE_KEY }}
-          gpg-passphrase: ${{ secrets.JRELEASER_GPG_PASSPHRASE }}
+          gpg-passphrase: JRELEASER_GPG_PASSPHRASE
 
       - name: Publish to Apache Maven Central
         env:
