@@ -1,8 +1,5 @@
 package com.infilos;
 
-import org.scalameta.ascii.graph.Graph;
-import org.scalameta.ascii.java.GraphBuilder;
-import org.scalameta.ascii.java.GraphLayouter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,25 +65,17 @@ public class DAGraph<Node, NodeMeta, EdgeMeta> {
         }
     }
 
+    /**
+     * render mermaid flowchart diagram as string
+     */
     public String render() {
-        GraphBuilder<Node> graphBuilder = new GraphBuilder<>();
+        StringBuilder builder = new StringBuilder("flowchart LR");
+        allEdges().forEach((k, v) -> v.forEach(e ->
+                builder.append(String.format("\n    %s([%s]) --> %s([%s])", k, k, e, e))
+        ));
+        builder.append("\n");
 
-        for (Node node : allNodes()) {
-            graphBuilder.addVertex(node);
-        }
-        for (Map.Entry<Node, Set<Node>> edges : allEdges().entrySet()) {
-            Node source = edges.getKey();
-            for (Node target : edges.getValue()) {
-                graphBuilder.addEdge(source, target);
-            }
-        }
-
-        Graph<Node> graph = graphBuilder.build();
-        GraphLayouter<Node> graphLayouter = new GraphLayouter<>();
-        graphLayouter.setVertical(false);
-        graphLayouter.setCompactify(false);
-
-        return graphLayouter.layout(graph);
+        return builder.toString();
     }
 
     /**
@@ -110,7 +99,6 @@ public class DAGraph<Node, NodeMeta, EdgeMeta> {
      *
      * @param source node of edge
      * @param target node of edge
-     *
      * @return false if the DAG result a ring
      */
     public boolean addEdge(Node source, Node target) {
@@ -123,7 +111,6 @@ public class DAGraph<Node, NodeMeta, EdgeMeta> {
      * @param source     node of origin
      * @param target     node of destination
      * @param createable whether the node needs to be created if it does not exist
-     *
      * @return The result of adding an edge. returns false if the DAG result is a ring result
      */
     private boolean addEdge(Node source, Node target, boolean createable) {
@@ -137,7 +124,6 @@ public class DAGraph<Node, NodeMeta, EdgeMeta> {
      * @param target     node of destination
      * @param edge       edge description
      * @param createable whether the node needs to be created if it does not exist
-     *
      * @return The result of adding an edge. returns false if the DAG result is a ring result
      */
     public boolean addEdge(Node source, Node target, EdgeMeta edge, boolean createable) {
@@ -167,7 +153,6 @@ public class DAGraph<Node, NodeMeta, EdgeMeta> {
      * whether this node is contained
      *
      * @param node is source or target node
-     *
      * @return true if contains
      */
     public boolean containsNode(Node node) {
@@ -185,7 +170,6 @@ public class DAGraph<Node, NodeMeta, EdgeMeta> {
      *
      * @param source node of edge
      * @param target node of edge
-     *
      * @return true if contains
      */
     public boolean containsEdge(Node source, Node target) {
@@ -194,7 +178,7 @@ public class DAGraph<Node, NodeMeta, EdgeMeta> {
         try {
             Map<Node, EdgeMeta> outEdges = forwardEdges.get(source);
 
-            return outEdges!=null && outEdges.containsKey(target);
+            return outEdges != null && outEdges.containsKey(target);
         } finally {
             lock.readLock().unlock();
         }
@@ -204,7 +188,6 @@ public class DAGraph<Node, NodeMeta, EdgeMeta> {
      * get node meta info
      *
      * @param node node
-     *
      * @return node meta info
      */
     public NodeMeta getNode(Node node) {
@@ -299,7 +282,6 @@ public class DAGraph<Node, NodeMeta, EdgeMeta> {
      * Gets all previous nodes of the node
      *
      * @param node node id to be calculated
-     *
      * @return all previous nodes of the node
      */
     public Set<Node> getPreviousNodes(Node node) {
@@ -316,7 +298,6 @@ public class DAGraph<Node, NodeMeta, EdgeMeta> {
      * Get all subsequent nodes of the node
      *
      * @param node node id to be calculated
-     *
      * @return all subsequent nodes of the node
      */
     public Set<Node> getSubsequentNodes(Node node) {
@@ -333,7 +314,6 @@ public class DAGraph<Node, NodeMeta, EdgeMeta> {
      * Gets the degree of entry of the node
      *
      * @param node node id
-     *
      * @return the degree of entry of the node
      */
     public int getIndegree(Node node) {
@@ -365,7 +345,6 @@ public class DAGraph<Node, NodeMeta, EdgeMeta> {
      * Only DAG has a topological sort
      *
      * @return topologically sorted results, returns false if the DAG result is a ring result
-     *
      * @throws Exception errors
      */
     public List<Node> topologicalSort() throws Exception {
@@ -415,7 +394,6 @@ public class DAGraph<Node, NodeMeta, EdgeMeta> {
      * @param source     node of origin
      * @param target     node of destination
      * @param createable whether to create a node
-     *
      * @return true if added
      */
     private boolean isLegalAddEdge(Node source, Node target, boolean createable) {
@@ -459,13 +437,12 @@ public class DAGraph<Node, NodeMeta, EdgeMeta> {
      *
      * @param node  Node id to be calculated
      * @param edges neighbor edge meta info
-     *
      * @return all neighbor nodes of the node
      */
     private Set<Node> getNeighborNodes(Node node, final Map<Node, Map<Node, EdgeMeta>> edges) {
         final Map<Node, EdgeMeta> neighborEdges = edges.get(node);
 
-        if (neighborEdges==null) {
+        if (neighborEdges == null) {
             return Collections.emptySet();
         }
 
@@ -497,7 +474,7 @@ public class DAGraph<Node, NodeMeta, EdgeMeta> {
             Node node = vertices.getKey();
             int inDegree = getIndegree(node);
 
-            if (inDegree==0) {
+            if (inDegree == 0) {
                 zeroIndegreeNodeQueue.add(node);
                 topoResultList.add(node);
             } else {
@@ -522,7 +499,7 @@ public class DAGraph<Node, NodeMeta, EdgeMeta> {
             for (Node subsequentNode : subsequentNodes) {
                 Integer degree = notZeroIndegreeNodeMap.get(subsequentNode);
 
-                if (--degree==0) {
+                if (--degree == 0) {
                     topoResultList.add(subsequentNode);
                     zeroIndegreeNodeQueue.add(subsequentNode);
                     notZeroIndegreeNodeMap.remove(subsequentNode);
@@ -534,8 +511,8 @@ public class DAGraph<Node, NodeMeta, EdgeMeta> {
 
         // if notZeroIndegreeNodeMap is empty,there is no ring!
         return new AbstractMap.SimpleEntry<>(
-            notZeroIndegreeNodeMap.size()==0,
-            topoResultList
+                notZeroIndegreeNodeMap.isEmpty(),
+                topoResultList
         );
     }
 }

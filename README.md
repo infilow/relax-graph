@@ -3,22 +3,16 @@
 Simple graph builder.
 
 - The Graph is copy and refined from Dolphin Scheduler, 
-- And Render with ascii-graphs which depends on scala 2.12.
+- And render mermaid flowchart diagram as string, copy and view the diagram with [https://mermaid.live](https://mermaid.live).
 
-```
-       ┌─┐    ┌─┐              
-       │ │    │ │              
-    ┌─>│2├───>│ │     ┌─┐      
-┌─┐ │  │ │    │5│     │ │   ┌─┐
-│ │ │  └─┘ ┌─>│ ├────>│ │   │ │
-│1├─┘      │  │ │     │6├──>│7│
-│ │    ┌─┐ │  └─┘ ┌──>│ │   │ │
-└─┘    │ │ │      │   │ │   └─┘
-       │3├─┘  ┌─┐ │   └─┘      
-       │ │    │ │ │            
-       └─┘    │4├─┘            
-              │ │              
-              └─┘ 
+```mermaid
+ flowchart LR
+    1([1]) --> 2([2])
+    2([2]) --> 5([5])
+    3([3]) --> 5([5])
+    4([4]) --> 6([6])
+    5([5]) --> 6([6])
+    6([6]) --> 7([7])
 ```
 
 ## Release
